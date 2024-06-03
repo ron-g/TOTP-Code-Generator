@@ -24,4 +24,6 @@ options:
 
 `-a` / `--appName` This will show the TOTP code given a comma-separated list of App Names configured in the `TotpVars.py` file's `Codes` dictionary.
 
+## Behavior
 
+When using `appName` or `oneOff`, the code foreground and an associated countdown bar's background will show with green, yellow, or red color depending on the amount of time left.
