@@ -35,19 +35,19 @@ NonExistentAppNames=[]
 parser = argparse.ArgumentParser(description="Output a TOTP code given a base32 string.")
 
 parser.add_argument(
-	"-a",
-	"--appName",
-	type=str,
-	default = "N/A",
-	help="The (comma-separated) Application Name(s) that is/are the key of a record in Codes dict."
-	)
-
-parser.add_argument(
 	"-l",
 	"--list",
 	action="store_true",
 	default = False,
 	help="Show the sites configured in the Codes dict."
+	)
+
+parser.add_argument(
+	"-a",
+	"--appName",
+	type=str,
+	default = "N/A",
+	help="The (comma-separated) Application Name(s) that is/are the key of a record in Codes dict."
 	)
 
 parser.add_argument(
