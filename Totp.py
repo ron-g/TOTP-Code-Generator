@@ -7,7 +7,6 @@ import argparse
 from sys import argv, exit
 from math import floor, ceil
 
-CHR=chr(164)
 CHR=' '
 
 try:
@@ -55,7 +54,6 @@ parser.add_argument(
 	"-o",
 	"--oneOff",
 	type=str,
-	default = "N/A",
 	help="Generate a code from this base32, skipping the Codes dict."
 	)
 
@@ -67,6 +65,11 @@ if args.list:
 		print(f'\t"{C2}{_}{RST}"')
 	print()
 	exit(0)
+
+if args.oneOff:
+	print(args.oneOff)
+	args.appName = 'One Off'
+	Codes = { args.appName : args.oneOff }
 
 TheApplications = args.appName.split(',')
 
@@ -105,7 +108,7 @@ for eachApp in TheApplications:
 				TimeLeftColor = BGOK
 				CodeColor = FGOK
 
-			print(f"\"{eachApp}\":\t{CodeColor}{totp.now()} {TimeLeftColor}{CHR * time_remaining}{RST}")
+			print(f'"{eachApp}":\t{CodeColor}{totp.now()} {TimeLeftColor}{CHR * time_remaining}{RST}')
 
 	else:
 		NonExistentAppNames.append(eachApp)
