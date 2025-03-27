@@ -4,7 +4,7 @@ import pyotp
 import datetime
 from TotpVars import Codes
 import argparse
-from sys import argv, exit
+from sys import argv, exit, stdout, stderr
 from math import floor, ceil
 
 CHR=' '
@@ -20,7 +20,7 @@ try:
 
 	RST = Style.RESET_ALL
 except:
-	print('colorama not available')
+	print('colorama not available', file=stderr)
 	C1, C2, RST = '', '', ''
 	OK, CAUTION, ERR = '', '', ''
 	C1, C2 = '', ''
@@ -67,7 +67,7 @@ if args.list:
 	exit(0)
 
 if args.oneOff:
-	print(args.oneOff)
+	#print(f"""TOTP code for One Off "{args.oneOff}":""")
 	args.appName = 'One Off'
 	Codes = { args.appName : args.oneOff }
 
@@ -93,7 +93,7 @@ for eachApp in TheApplications:
 					Plural[1]="s"
 
 		if InvalidCherrors:
-			print(f"-There {Plural[0]} {len(InvalidChars)} invalid character{Plural[1]} in value for \"{eachApp}\".\n\t{', '.join(InvalidChars)}\n")
+			print(f"{FGERR}-There {Plural[0]} {len(InvalidChars)} invalid character{Plural[1]} in value for \"{eachApp}\".{RST}\n\t{', '.join(InvalidChars)}\n", file=stderr)
 			exit(1)
 		else:
 			totp = pyotp.TOTP(TheCode)
@@ -116,6 +116,6 @@ for eachApp in TheApplications:
 
 if len(NonExistentAppNames) >0:
 	for eachApp in NonExistentAppNames:
-		print(f"-\"{eachApp}\" isn't a valid App Name in the dictionary. Skipped.")
+		print(f"""{FGERR}-"{eachApp}" isn't a valid App Name in the dictionary. Skipped.{RST}""", file=stderr)
 
 
