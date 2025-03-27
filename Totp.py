@@ -8,6 +8,7 @@ from sys import argv, exit, stdout, stderr
 from math import floor, ceil
 
 CHR=' '
+widthAppName = -1
 
 try:
 	from colorama import Back, Fore, Style
@@ -72,6 +73,13 @@ if args.oneOff:
 	Codes = { args.appName : args.oneOff }
 
 TheApplications = args.appName.split(',')
+TheApplications = sorted(set(TheApplications))
+
+for eachApp in TheApplications:
+	if eachApp in Codes:
+		widthAppName = max(len(eachApp), widthAppName)
+
+widthAppName += 2
 
 for eachApp in TheApplications:
 	InvalidChars=''
@@ -108,7 +116,7 @@ for eachApp in TheApplications:
 				TimeLeftColor = BGOK
 				CodeColor = FGOK
 
-			print(f'"{eachApp}":\t{CodeColor}{totp.now()} {TimeLeftColor}{CHR * time_remaining}{RST}')
+			print(f"""{eachApp + ':': <{widthAppName}}{CodeColor}{totp.now()} {TimeLeftColor}{CHR * time_remaining}{RST}""")
 
 	else:
 		NonExistentAppNames.append(eachApp)
