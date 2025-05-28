@@ -116,7 +116,7 @@ for eachApp in TheApplications:
 				TimeLeftColor = BGOK
 				CodeColor = FGOK
 
-			print(f"""{eachApp + ':': <{widthAppName}}{CodeColor}{totp.now()} {TimeLeftColor}{CHR * time_remaining}{RST}""")
+			print(f"""{eachApp + ':': <{widthAppName}}{CodeColor}{totp.now()} [{time_remaining: >2}] {TimeLeftColor}{CHR * time_remaining}{RST}""")
 
 	else:
 		NonExistentAppNames.append(eachApp)
