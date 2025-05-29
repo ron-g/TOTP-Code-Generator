@@ -6,7 +6,9 @@ from TotpVars import Codes
 import argparse
 from sys import argv, exit, stdout, stderr
 from math import floor, ceil
+from time import sleep as zzz
 
+clear="\x1b[H\x1b[2J"
 CHR=' '
 widthAppName = -1
 
@@ -58,6 +60,14 @@ parser.add_argument(
 	help="Generate a code from this base32, skipping the Codes dict."
 	)
 
+parser.add_argument(
+	"-w",
+	"--whyle",
+	action="store_true",
+	default = False,
+	help="Show the TOTP token(s) in a loop. Ctrl+c to quit."
+	)
+
 args = parser.parse_args()
 
 if args.list:
@@ -81,46 +91,58 @@ for eachApp in TheApplications:
 
 widthAppName += 2
 
-for eachApp in TheApplications:
-	InvalidChars=''
-	InvalidCherrors=False
-	Plural= [ "was", '' ]
+while True:
+	try:
+		if args.whyle:
+			print(clear, end='')
+		for eachApp in TheApplications:
+			InvalidChars=''
+			InvalidCherrors=False
+			Plural= [ "was", '' ]
 
-	if eachApp in Codes:
+			if eachApp in Codes:
 
-		TheCode = Codes[eachApp].replace(' ','')
+				TheCode = Codes[eachApp].replace(' ','')
 
-		for char in TheCode:
-			if char in ValidBase32Chars:
+				for char in TheCode:
+					if char in ValidBase32Chars:
+						continue
+					else:
+						InvalidCherrors=True
+						InvalidChars=f"{InvalidChars}{char}"
+						if len(InvalidChars) >1:
+							Plural[0]="were"
+							Plural[1]="s"
+
+				if InvalidCherrors:
+					print(f"{FGERR}-There {Plural[0]} {len(InvalidChars)} invalid character{Plural[1]} in value for \"{eachApp}\".{RST}\n\t{', '.join(InvalidChars)}\n", file=stderr)
+					exit(1)
+				else:
+					totp = pyotp.TOTP(TheCode)
+					time_remaining = ceil(totp.interval - datetime.datetime.now().timestamp() % totp.interval)
+					if time_remaining <= ceil(.15 * totp.interval):
+						TimeLeftColor = BGERR
+						CodeColor = FGERR
+					elif time_remaining <= ceil(.30 * totp.interval):
+						TimeLeftColor = BGCAUTION
+						CodeColor = FGCAUTION
+					else:
+						TimeLeftColor = BGOK
+						CodeColor = FGOK
+
+					print(f"""{eachApp + ':': <{widthAppName}}{CodeColor}{totp.now()} [{time_remaining: >2}] {TimeLeftColor}{CHR * time_remaining}{RST}""")
+
+			else:
+				NonExistentAppNames.append(eachApp)
 				continue
-			else:
-				InvalidCherrors=True
-				InvalidChars=f"{InvalidChars}{char}"
-				if len(InvalidChars) >1:
-					Plural[0]="were"
-					Plural[1]="s"
 
-		if InvalidCherrors:
-			print(f"{FGERR}-There {Plural[0]} {len(InvalidChars)} invalid character{Plural[1]} in value for \"{eachApp}\".{RST}\n\t{', '.join(InvalidChars)}\n", file=stderr)
-			exit(1)
+		if args.whyle:
+			zzz(1)
 		else:
-			totp = pyotp.TOTP(TheCode)
-			time_remaining = ceil(totp.interval - datetime.datetime.now().timestamp() % totp.interval)
-			if time_remaining <= ceil(.15 * totp.interval):
-				TimeLeftColor = BGERR
-				CodeColor = FGERR
-			elif time_remaining <= ceil(.30 * totp.interval):
-				TimeLeftColor = BGCAUTION
-				CodeColor = FGCAUTION
-			else:
-				TimeLeftColor = BGOK
-				CodeColor = FGOK
-
-			print(f"""{eachApp + ':': <{widthAppName}}{CodeColor}{totp.now()} [{time_remaining: >2}] {TimeLeftColor}{CHR * time_remaining}{RST}""")
-
-	else:
-		NonExistentAppNames.append(eachApp)
-		continue
+			break
+	except KeyboardInterrupt as e:
+		print("Exiting.")
+		exit(0)
 
 if len(NonExistentAppNames) >0:
 	for eachApp in NonExistentAppNames:
